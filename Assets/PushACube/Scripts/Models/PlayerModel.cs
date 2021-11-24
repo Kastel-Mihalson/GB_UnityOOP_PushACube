@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerModel : PlayerSettings
 {
-    public event Action Death;
-    public event Action<float> ChangeHealth;
+    public event Action DeathEvent;
+    public event Action<float> ChangeHealthEvent;
+    public event Action<Color> ChangeColorEvent;
 
     private float _currentHealth;
 
@@ -32,6 +31,10 @@ public class PlayerModel : PlayerSettings
             throw new Exception("Component rigidBody for Player is not defind or null. Check it out");
         }
     }
+    public void ChangeColor(Color color)
+    {
+        ChangeColorEvent?.Invoke(color);
+    }
 
     public void SetNewHealthValue(float damageValue)
     {
@@ -39,11 +42,11 @@ public class PlayerModel : PlayerSettings
 
         if (_currentHealth > 0)
         {
-            ChangeHealth?.Invoke(_currentHealth);
+            ChangeHealthEvent?.Invoke(_currentHealth);
         }
         else
         {
-            Death?.Invoke();
+            DeathEvent?.Invoke();
         }
     }
 

@@ -1,22 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CubeBonusView : InteractiveObjects
 {
-    private GameObject _playerGO;
+    private PlayerView _playerView;
 
     private void Start()
     {
-        _playerGO = GameObject.FindObjectOfType<PlayerView>().gameObject;
+        _playerView = GameObject.FindObjectOfType<PlayerView>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.name.Equals(_playerGO.name))
+        if (other.name.Equals(_playerView.gameObject.name))
         {
             Debug.Log("Собрали бонус");
-            Destroy(gameObject, 0.2f);
+            _playerView.ChangeColor(gameObject.GetComponent<Renderer>().material.color);
+            Destroy(gameObject, 0.1f);
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 class PlayerController : IDisposable
@@ -16,8 +14,9 @@ class PlayerController : IDisposable
 
     public void Enable()
     {
-        _playerModel.ChangeHealth += ChangeHealth;
-        _playerModel.Death += Death;
+        _playerModel.ChangeHealthEvent += ChangeHealth;
+        _playerModel.DeathEvent += Death;
+        _playerModel.ChangeColorEvent += ChangeColor;
     }
 
     public void PlayerMove(Rigidbody rigidbody, Transform transform)
@@ -36,9 +35,15 @@ class PlayerController : IDisposable
         Dispose();
     }
 
+    public void ChangeColor(Color color)
+    {
+        _playerView.ChangeColor(color);
+    }
+
     public void Dispose()
     {
-        _playerModel.ChangeHealth -= ChangeHealth;
-        _playerModel.Death -= Death;
+        _playerModel.ChangeHealthEvent -= ChangeHealth;
+        _playerModel.DeathEvent -= Death;
+        _playerModel.ChangeColorEvent -= ChangeColor;
     }
 }
