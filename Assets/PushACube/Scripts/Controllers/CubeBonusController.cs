@@ -1,4 +1,4 @@
-public class CubeBonusController
+﻿public class CubeBonusController
 {
     private CubeBonusModel _cubeBonusModel;
     private CubeBonusView _cubeBonusView;

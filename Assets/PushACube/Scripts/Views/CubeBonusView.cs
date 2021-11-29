@@ -1,4 +1,4 @@
-using UnityEngine;
+п»їusing UnityEngine;
 
 public class CubeBonusView : InteractiveObjects
 {
@@ -17,7 +17,7 @@ public class CubeBonusView : InteractiveObjects
         {
             if (other.name.Equals(_playerView.gameObject.name))
             {
-                Debug.Log("Собрали бонус");
+                Debug.Log("РЎРѕР±СЂР°Р»Рё Р±РѕРЅСѓСЃ");
                 _playerView.ChangeColor(gameObject.GetComponent<Renderer>().material.color);
                 _playerHUDView.CurrentCubeBonusCount = 1;
                 Destroy(gameObject, 0.1f);

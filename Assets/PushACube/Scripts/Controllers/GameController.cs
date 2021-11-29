@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -142,7 +142,7 @@ public class GameController : MonoBehaviour
                 _playerHUDCanvas.SetActive(false);
                 _endGameCanvas.SetActive(true);
                 _endGameView.SetWinOrLoseText(currentCubeBonusCount, maxCubeBonusCount);
-                Debug.Log("ÂÐÅÌß ÂÛØËÎ!");
+                Debug.Log("Ð’Ð Ð•ÐœÐ¯ Ð’Ð«Ð¨Ð›Ðž!");
             }
         }
     }

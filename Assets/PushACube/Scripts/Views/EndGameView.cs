@@ -1,4 +1,4 @@
-using System.Collections;
+п»їusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,11 +22,11 @@ public class EndGameView : MonoBehaviour
 
         _endGameResultTexts = new string[]
         { 
-            "Превосходный результат",
-            "Вы хорошо справились",
-            "Не плохой результат",
-            "Эх, мда-а. Чуть-чуть не хватило",
-            "Вы были далеко от победы"
+            "РџСЂРµРІРѕСЃС…РѕРґРЅС‹Р№ СЂРµР·СѓР»СЊС‚Р°С‚",
+            "Р’С‹ С…РѕСЂРѕС€Рѕ СЃРїСЂР°РІРёР»РёСЃСЊ",
+            "РќРµ РїР»РѕС…РѕР№ СЂРµР·СѓР»СЊС‚Р°С‚",
+            "Р­С…, РјРґР°-Р°. Р§СѓС‚СЊ-С‡СѓС‚СЊ РЅРµ С…РІР°С‚РёР»Рѕ",
+            "Р’С‹ Р±С‹Р»Рё РґР°Р»РµРєРѕ РѕС‚ РїРѕР±РµРґС‹"
         };
     }
 
@@ -35,7 +35,7 @@ public class EndGameView : MonoBehaviour
         _isWin = cubeBonusCount > 13;
 
         _winOrLoseText.color = _isWin ? new Color(116, 255, 0) : new Color(255, 64, 0);
-        _winOrLoseText.text = _isWin ? "Победа!" : "Поражение!";
+        _winOrLoseText.text = _isWin ? "РџРѕР±РµРґР°!" : "РџРѕСЂР°Р¶РµРЅРёРµ!";
 
         string endGameResultText = "";
         
@@ -59,7 +59,7 @@ public class EndGameView : MonoBehaviour
         {
             endGameResultText = _endGameResultTexts[4];
         }
-        _endGameResultText.text =  $"{endGameResultText}. Собрано {cubeBonusCount} из {maxCubeBonusCount} кубиков.";
+        _endGameResultText.text =  $"{endGameResultText}. РЎРѕР±СЂР°РЅРѕ {cubeBonusCount} РёР· {maxCubeBonusCount} РєСѓР±РёРєРѕРІ.";
     }
 
     private void RestartGame()

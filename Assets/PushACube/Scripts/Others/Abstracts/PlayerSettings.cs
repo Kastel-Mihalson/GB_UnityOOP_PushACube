@@ -1,4 +1,4 @@
-public abstract class PlayerSettings
+﻿public abstract class PlayerSettings
 {
     protected const string HORIZONTAL = "Horizontal";
     protected const string VERTICAL = "Vertical";

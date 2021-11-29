@@ -1,4 +1,4 @@
-using System.Collections;
+п»їusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -45,7 +45,7 @@ public class PlayerHUDView : MonoBehaviour
     {
         if (_currentCubeBonusCount != _isCurrentCubeBonusCountChanged)
         {
-            Debug.Log("Количество бонусов изменилось. Метод вызвался!");
+            Debug.Log("РљРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕРЅСѓСЃРѕРІ РёР·РјРµРЅРёР»РѕСЃСЊ. РњРµС‚РѕРґ РІС‹Р·РІР°Р»СЃСЏ!");
             _cubeBonusCounter.text = $"{_currentCubeBonusCount} / {_maxCubeBonusCount}";
             _isCurrentCubeBonusCountChanged = _currentCubeBonusCount;
         }

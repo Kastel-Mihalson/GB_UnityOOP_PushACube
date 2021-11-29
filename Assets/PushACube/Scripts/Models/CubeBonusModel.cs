@@ -1,4 +1,4 @@
-public class CubeBonusModel
+﻿public class CubeBonusModel
 {
     
 }
