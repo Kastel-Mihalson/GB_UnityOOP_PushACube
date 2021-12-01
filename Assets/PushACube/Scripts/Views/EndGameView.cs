@@ -9,11 +9,28 @@ public class EndGameView : MonoBehaviour
     private Text _winOrLoseText;
     private Text _endGameResultText;
     private Button _restartGameButton;
+
     private bool _isWin;
     private string[] _endGameResultTexts;
 
+    private Dictionary<EndGameResult, string> _endGameResultTextColor;
+
+    private enum EndGameResult
+    {
+        Win = 1,
+        Lose,
+        Soso
+    }
+
     private void Awake()
     {
+        _endGameResultTextColor = new Dictionary<EndGameResult, string>
+        {
+            { EndGameResult.Win, "9FFF00" },
+            { EndGameResult.Lose, "FF4000" },
+            { EndGameResult.Soso, "FFF600" }
+        };
+
         _winOrLoseText = transform.GetChild(0).GetComponent<Text>();
         _endGameResultText = transform.GetChild(1).GetComponent<Text>();
         _restartGameButton = transform.GetChild(2).GetComponent<Button>();
@@ -33,9 +50,9 @@ public class EndGameView : MonoBehaviour
     public void SetWinOrLoseText(int cubeBonusCount, int maxCubeBonusCount)
     {
         _isWin = cubeBonusCount > 13;
-
-        _winOrLoseText.color = _isWin ? new Color(116, 255, 0) : new Color(255, 64, 0);
-        _winOrLoseText.text = _isWin ? "Победа!" : "Поражение!";
+        _winOrLoseText.text = _isWin ? 
+            $"<color=#{_endGameResultTextColor[EndGameResult.Win]}>Победа!</color>" : 
+            $"<color=#{_endGameResultTextColor[EndGameResult.Lose]}>Поражение!</color>";
 
         string endGameResultText = "";
         
@@ -59,7 +76,7 @@ public class EndGameView : MonoBehaviour
         {
             endGameResultText = _endGameResultTexts[4];
         }
-        _endGameResultText.text =  $"{endGameResultText}. Собрано {cubeBonusCount} из {maxCubeBonusCount} кубиков.";
+        _endGameResultText.text =  $"<color=#{_endGameResultTextColor[EndGameResult.Soso]}>{endGameResultText}.</color>\n<color=white>Собрано {cubeBonusCount} из {maxCubeBonusCount} кубиков.</color>";
     }
 
     private void RestartGame()

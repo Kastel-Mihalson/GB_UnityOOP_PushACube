@@ -32,6 +32,14 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        List<int> list = new List<int> { 1, 3, 1, 2, 5, 3, 2, 2, 7, 6, 7 };
+        Debug.Log($"String Extension HelloWorld.CharCount('l'): {"HelloWorld".CharCount('l')}");
+        Debug.Log("Elements occurrences number:");
+        foreach (var item in list.ElementsOccNumber())
+        {
+            Debug.Log($"{item.Key} : {item.Value}");
+        }
+
         Time.timeScale = 1;
 
         LoadResources();
