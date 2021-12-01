@@ -1,4 +1,4 @@
-public static class StringExtension
+﻿public static class StringExtension
 {
     public static int CharCount(this string str, char ch)
     {
