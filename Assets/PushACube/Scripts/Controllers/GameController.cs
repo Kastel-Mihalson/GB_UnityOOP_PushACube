@@ -5,12 +5,24 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
+
+    #region Fields
+
+    private GameObject _floorPrefab;
+    private GameObject _floorGameObject;
+    private GameObject _gameOverDeathLine;
+
     private GameObject _playerPrefab;
     private GameObject _playerGameObject;
     private PlayerController _playerController;
     private PlayerModel _playerModel;
     private PlayerView _playerView;
     private Rigidbody _playerRigidBody;
+    private float _playerSaveSpeed;
+    private float _cubeSpeedBonusTime;
+
+    private GameObject _cubeSpeedBonusPrefab;
+    private GameObject _cubeSpeedBonusGameObject;
 
     private GameObject _cubeBonusPrefab;
     private GameObject _cubeBonusGameObject;
@@ -30,8 +42,11 @@ public class GameController : MonoBehaviour
     private EndGameView _endGameView;
     private bool _endGame;
 
+    #endregion
+
     void Start()
     {
+        // Вывод результата по практическому заданию
         List<int> list = new List<int> { 1, 3, 1, 2, 5, 3, 2, 2, 7, 6, 7 };
         Debug.Log($"String Extension HelloWorld.CharCount('l'): {"HelloWorld".CharCount('l')}");
         Debug.Log("Elements occurrences number:");
@@ -42,9 +57,13 @@ public class GameController : MonoBehaviour
 
         Time.timeScale = 1;
 
+        // Загрузка префабов из ресурсов
         LoadResources();
+        // Инициализация префабов, моделей, вью и контроллеров
+        InitFloor();
         InitPlayer();
         InitPlayerHUD();
+        InitCubeSpeedBonus();
 
         int cubeBonusCount = _playerHUDView.MaxCubeBonusCount;
 
@@ -64,6 +83,7 @@ public class GameController : MonoBehaviour
         InteractiveObjects();
         PlayerHUDUpdate();
         EndGameUpdate();
+        IsPlayerMoveSpeedChanged();
     }
 
     private void InteractiveObjects()
@@ -83,10 +103,22 @@ public class GameController : MonoBehaviour
 
     private void LoadResources()
     {
+        _floorPrefab = Resources.Load("Floor") as GameObject;
         _playerPrefab = Resources.Load("Player") as GameObject;
         _cubeBonusPrefab = Resources.Load("CubeBonus") as GameObject;
+        _cubeSpeedBonusPrefab = Resources.Load("CubeSpeedBonus") as GameObject;
         _playerHUDPrefab = Resources.Load("PlayerHUDCanvas") as GameObject;
         _endGamePrefab = Resources.Load("EndGameCanvas") as GameObject;
+    }
+
+    private void InitFloor()
+    {
+        _floorGameObject = Instantiate(_floorPrefab, new Vector3(0f, -0.25f, 0f), Quaternion.identity);
+        _gameOverDeathLine = new GameObject("GameOverDeathLine");
+
+        _gameOverDeathLine.AddComponent<BoxCollider>().isTrigger = true;
+        _gameOverDeathLine.transform.localScale = new Vector3(30f, 2f, 30f);
+        _gameOverDeathLine.transform.position = new Vector3(0f, -5f, 0f);
     }
 
     private void InitPlayer()
@@ -97,6 +129,15 @@ public class GameController : MonoBehaviour
         _playerRigidBody = _playerGameObject.GetComponent<Rigidbody>();
         _playerController = new PlayerController(_playerModel, _playerView);
         _playerController.Enable();
+
+        _playerView.GameOverDeathLine = _gameOverDeathLine;
+        _playerSaveSpeed = _playerModel.MoveSpeed;
+        _cubeSpeedBonusTime = _playerModel.MoveSpeedBonusTime;
+    }
+
+    private void InitCubeSpeedBonus()
+    {
+        _cubeSpeedBonusGameObject = Instantiate(_cubeSpeedBonusPrefab, new Vector3(Random.Range((int)-9f, (int)9f), 0.5f, Random.Range((int)-9f, (int)9f)), Quaternion.identity);
     }
 
     private void InitCubeBonus()
@@ -120,7 +161,7 @@ public class GameController : MonoBehaviour
         _endGameCanvas = Instantiate(_endGamePrefab, Vector3.zero, Quaternion.identity);
         _endGameView = _endGameCanvas.GetComponent<EndGameView>();
         _endGameCanvas.SetActive(false);
-        _endGame = true;
+        _endGame = false;
     }
 
     private void PlayerUpdate()
@@ -136,21 +177,43 @@ public class GameController : MonoBehaviour
 
     private void EndGameUpdate()
     {
-        if (_endGame)
+        if (!_endGame)
         {
             float time = _playerHUDView.TimerSeconds;
             int currentCubeBonusCount = _playerHUDView.CurrentCubeBonusCount;
             int maxCubeBonusCount = _playerHUDView.MaxCubeBonusCount;
+            bool isGameOver = _playerView.IsGameOver;
 
-            if (time <= 0 || currentCubeBonusCount == maxCubeBonusCount)
+            if (time <= 0 || currentCubeBonusCount == maxCubeBonusCount || isGameOver)
             {
-                _endGame = false;
+                _endGame = true;
                 Time.timeScale = 0;
+                _playerController.Dispose();
 
                 _playerHUDCanvas.SetActive(false);
                 _endGameCanvas.SetActive(true);
-                _endGameView.SetWinOrLoseText(currentCubeBonusCount, maxCubeBonusCount);
+                _endGameView.SetWinOrLoseText(currentCubeBonusCount, maxCubeBonusCount, isGameOver);
                 Debug.Log("ВРЕМЯ ВЫШЛО!");
+            }
+        }
+    }
+
+    private void IsPlayerMoveSpeedChanged()
+    {
+        // Если скорость игрока изменилась, то
+        if (_playerModel.MoveSpeed != _playerSaveSpeed)
+        {
+            // Пока не прошло _playerModel.MoveSpeedBonusTime секунд
+            _playerModel.MoveSpeedBonusTime -= Time.deltaTime;
+            
+            if (_playerModel.MoveSpeedBonusTime <= 0)
+            {
+                // Когда прошло _playerModel.MoveSpeedBonusTime секунд, то
+                // Восстанавливаем изначальную скорость
+                _playerModel.MoveSpeed = _playerSaveSpeed;
+                // Устанавливаем время снова на прежднее значение
+                _playerModel.MoveSpeedBonusTime = _cubeSpeedBonusTime;
+                
             }
         }
     }

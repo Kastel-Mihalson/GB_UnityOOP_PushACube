@@ -9,6 +9,20 @@ public class PlayerModel : PlayerSettings
 
     private float _currentHealth;
 
+    public float MoveSpeed
+    {
+        get => moveSpeed;
+        set => moveSpeed = value;
+    }
+
+    public float MoveSpeedBonusTime
+    {
+        get => moveSpeedBonusTime;
+        set => moveSpeedBonusTime = value;
+    }
+    public float SPEED_BONUS_TIME => SPEED_BONUS_TIME;
+    public float MOVE_SPEED => MOVE_SPEED;
+
     public PlayerModel()
     {
         _currentHealth = maxHealth;
@@ -23,7 +37,7 @@ public class PlayerModel : PlayerSettings
         {
             Vector3 rotate = new Vector3(0, horizontal * turnSpeed, 0);
 
-            rigidbody.MovePosition(transform.position + transform.TransformDirection(new Vector3(0, 0, vertical)) * moveSpeed * Time.fixedDeltaTime);
+            rigidbody.MovePosition(transform.position + transform.TransformDirection(new Vector3(0, 0, vertical)) * MoveSpeed * Time.fixedDeltaTime);
             rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(rotate));
         }
         else
@@ -31,6 +45,7 @@ public class PlayerModel : PlayerSettings
             throw new Exception("Component rigidBody for Player is not defind or null. Check it out");
         }
     }
+
     public void ChangeColor(Color color)
     {
         ChangeColorEvent?.Invoke(color);
@@ -50,4 +65,8 @@ public class PlayerModel : PlayerSettings
         }
     }
 
+    public void ChangeSpeed(float speed)
+    {
+        MoveSpeed += speed;
+    }
 }

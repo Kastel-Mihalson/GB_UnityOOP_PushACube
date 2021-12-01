@@ -10,6 +10,8 @@ class PlayerController : IDisposable
     {
         _playerModel = model;
         _playerView = view;
+
+        _playerView.PlayerModel = _playerModel;
     }
 
     public void Enable()
