@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class PlayerView : MonoBehaviour
 {
-    private PlayerModel _playerModel;
+    public event Action<Color> ChangePlayerColorEvent;
+    public event Action<float> ChangePlayerSpeedEvent;
+
     private GameObject _gameOverDeathLine;
     private bool _isGameOver;
 
@@ -18,36 +21,14 @@ public class PlayerView : MonoBehaviour
         set => _isGameOver = value;
     }
 
-    public PlayerModel PlayerModel
-    {
-        get => _playerModel;
-        set => _playerModel = value;
-    }
-
-    public void ChangeHealth(float health)
-    {
-
-    }
-
-    public void Death()
-    {
-
-    }
-
     public void ChangeColor(Color color)
     {
-        var playerLight = transform.GetComponent<Light>();
-        var playerMaterial = transform.GetComponent<Renderer>().material;
-
-        playerLight.color = color;
-        playerLight.intensity += 1;
-        playerMaterial.color = color;
+        ChangePlayerColorEvent?.Invoke(color);
     }
 
     public void ChangeSpeed(float speed)
     {
-        Debug.Log($"Установили новую скорость {speed}");
-        _playerModel.MoveSpeed += speed;
+        ChangePlayerSpeedEvent?.Invoke(speed);
     }
 
     private void OnTriggerEnter(Collider other)

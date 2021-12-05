@@ -10,7 +10,7 @@ public class CubeBonusView : InteractiveObjects
             {
                 Debug.Log("Собрали бонус");
                 _playerView.ChangeColor(gameObject.GetComponent<Renderer>().material.color);
-                _playerHUDView.CurrentCubeBonusCount = 1;
+                _playerHUDView.CurrentCubeBonusCount(1);
                 Destroy(gameObject, 0.1f);
             }
         }

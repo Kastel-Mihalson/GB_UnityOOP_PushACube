@@ -18,8 +18,6 @@ public class GameController : MonoBehaviour
     private PlayerModel _playerModel;
     private PlayerView _playerView;
     private Rigidbody _playerRigidBody;
-    private float _playerSaveSpeed;
-    private float _cubeSpeedBonusTime;
 
     private GameObject _cubeSpeedBonusPrefab;
     private GameObject _cubeSpeedBonusGameObject;
@@ -42,6 +40,9 @@ public class GameController : MonoBehaviour
     private EndGameView _endGameView;
     private bool _endGame;
 
+    private int _levelSizeX;
+    private int _levelSizeZ;
+
     #endregion
 
     void Start()
@@ -56,6 +57,8 @@ public class GameController : MonoBehaviour
         }
 
         Time.timeScale = 1;
+        _levelSizeX = 20;
+        _levelSizeZ = 30;
 
         // Загрузка префабов из ресурсов
         LoadResources();
@@ -65,11 +68,14 @@ public class GameController : MonoBehaviour
         InitPlayerHUD();
         InitCubeSpeedBonus();
 
-        int cubeBonusCount = _playerHUDView.MaxCubeBonusCount;
+        int cubeBonusCount = _playerHUDController.MaxCubeBonusCount;
 
         for (int i = 0; i < cubeBonusCount; i++)
         {
-            InitCubeBonus();
+            float x = Random.Range((int)-10f, (int)9f) + 0.5f;
+            float z = Random.Range((int)-10f, (int)9f) + 0.5f;
+
+            InitCubeBonus(x, z);
         }
 
         InitEndGame();
@@ -83,7 +89,6 @@ public class GameController : MonoBehaviour
         InteractiveObjects();
         PlayerHUDUpdate();
         EndGameUpdate();
-        IsPlayerMoveSpeedChanged();
     }
 
     private void InteractiveObjects()
@@ -110,6 +115,8 @@ public class GameController : MonoBehaviour
         _playerHUDPrefab = Resources.Load("PlayerHUDCanvas") as GameObject;
         _endGamePrefab = Resources.Load("EndGameCanvas") as GameObject;
     }
+    
+    #region INIT METHODS
 
     private void InitFloor()
     {
@@ -128,11 +135,9 @@ public class GameController : MonoBehaviour
         _playerView = _playerGameObject.GetComponent<PlayerView>();
         _playerRigidBody = _playerGameObject.GetComponent<Rigidbody>();
         _playerController = new PlayerController(_playerModel, _playerView);
-        _playerController.Enable();
+        _playerController.EnableEvents();
 
         _playerView.GameOverDeathLine = _gameOverDeathLine;
-        _playerSaveSpeed = _playerModel.MoveSpeed;
-        _cubeSpeedBonusTime = _playerModel.MoveSpeedBonusTime;
     }
 
     private void InitCubeSpeedBonus()
@@ -140,10 +145,10 @@ public class GameController : MonoBehaviour
         _cubeSpeedBonusGameObject = Instantiate(_cubeSpeedBonusPrefab, new Vector3(Random.Range((int)-9f, (int)9f), 0.5f, Random.Range((int)-9f, (int)9f)), Quaternion.identity);
     }
 
-    private void InitCubeBonus()
+    private void InitCubeBonus(float X, float Z)
     {
         _cubeBonusModel = new CubeBonusModel();
-        _cubeBonusGameObject = Instantiate(_cubeBonusPrefab, new Vector3(Random.Range((int)-9f, (int)9f), 0.5f, Random.Range((int)-9f, (int)9f)), Quaternion.identity);
+        _cubeBonusGameObject = Instantiate(_cubeBonusPrefab, new Vector3(X, 0.5f, Z), Quaternion.identity);
         _cubeBonusView = _cubeBonusGameObject.GetComponent<CubeBonusView>();
         _cubeBonusController = new CubeBonusController(_cubeBonusModel, _cubeBonusView);
     }
@@ -151,9 +156,10 @@ public class GameController : MonoBehaviour
     private void InitPlayerHUD()
     {
         _playerHUDCanvas = Instantiate(_playerHUDPrefab, Vector3.zero, Quaternion.identity);
-        _playerHUDModel = new PlayerHUDModel();
         _playerHUDView = _playerHUDCanvas.GetComponent<PlayerHUDView>();
+        _playerHUDModel = new PlayerHUDModel(_playerHUDView);
         _playerHUDController = new PlayerHUDController(_playerHUDModel, _playerHUDView);
+        _playerHUDController.EnableEvent();
     }
 
     private void InitEndGame()
@@ -164,57 +170,45 @@ public class GameController : MonoBehaviour
         _endGame = false;
     }
 
+    #endregion
+
+    #region UPDATE METHODS
+
     private void PlayerUpdate()
     {
         _playerController.PlayerMove(_playerRigidBody, _playerGameObject.transform);
+        _playerController.SetPlayerDefaultSpeedAfterBonusEffect();
     }
 
     private void PlayerHUDUpdate()
     {
-        _playerHUDView.SetCubeBonusCount();
-        _playerHUDView.Timer();
+        _playerHUDController.SetCubeBonusCount();
+        _playerHUDController.Timer();
     }
 
     private void EndGameUpdate()
     {
         if (!_endGame)
         {
-            float time = _playerHUDView.TimerSeconds;
-            int currentCubeBonusCount = _playerHUDView.CurrentCubeBonusCount;
-            int maxCubeBonusCount = _playerHUDView.MaxCubeBonusCount;
+            float time = _playerHUDController.TimerSeconds;
+            int currentCubeBonusCount = _playerHUDController.CurrentCubeBonusCount;
+            int maxCubeBonusCount = _playerHUDController.MaxCubeBonusCount;
             bool isGameOver = _playerView.IsGameOver;
 
             if (time <= 0 || currentCubeBonusCount == maxCubeBonusCount || isGameOver)
             {
                 _endGame = true;
                 Time.timeScale = 0;
-                _playerController.Dispose();
 
                 _playerHUDCanvas.SetActive(false);
                 _endGameCanvas.SetActive(true);
                 _endGameView.SetWinOrLoseText(currentCubeBonusCount, maxCubeBonusCount, isGameOver);
-                Debug.Log("ВРЕМЯ ВЫШЛО!");
+
+                _playerHUDController.DisposeEvent();
+                _playerController.DisposeEvents();
             }
         }
     }
 
-    private void IsPlayerMoveSpeedChanged()
-    {
-        // Если скорость игрока изменилась, то
-        if (_playerModel.MoveSpeed != _playerSaveSpeed)
-        {
-            // Пока не прошло _playerModel.MoveSpeedBonusTime секунд
-            _playerModel.MoveSpeedBonusTime -= Time.deltaTime;
-            
-            if (_playerModel.MoveSpeedBonusTime <= 0)
-            {
-                // Когда прошло _playerModel.MoveSpeedBonusTime секунд, то
-                // Восстанавливаем изначальную скорость
-                _playerModel.MoveSpeed = _playerSaveSpeed;
-                // Устанавливаем время снова на прежднее значение
-                _playerModel.MoveSpeedBonusTime = _cubeSpeedBonusTime;
-                
-            }
-        }
-    }
+    #endregion
 }

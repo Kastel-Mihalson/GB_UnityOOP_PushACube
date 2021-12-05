@@ -1,13 +1,13 @@
-﻿using System;
-using UnityEngine;
-
-public class PlayerModel : PlayerSettings
+﻿public class PlayerModel
 {
-    public event Action DeathEvent;
-    public event Action<float> ChangeHealthEvent;
-    public event Action<Color> ChangeColorEvent;
+    public float oldSpeed;
+    public float moveSpeed;
+    public float turnSpeed;
+    public float moveSpeedBonusTime;
+    public float oldMoveSpeedBonusTime;
 
-    private float _currentHealth;
+    public string HORIZONTAL = "Horizontal";
+    public string VERTICAL = "Vertical";
 
     public float MoveSpeed
     {
@@ -20,53 +20,13 @@ public class PlayerModel : PlayerSettings
         get => moveSpeedBonusTime;
         set => moveSpeedBonusTime = value;
     }
-    public float SPEED_BONUS_TIME => SPEED_BONUS_TIME;
-    public float MOVE_SPEED => MOVE_SPEED;
 
     public PlayerModel()
     {
-        _currentHealth = maxHealth;
-    }
-
-    public void PlayerMove(Rigidbody rigidbody, Transform transform)
-    {
-        float vertical = Input.GetAxis(VERTICAL);
-        float horizontal = Input.GetAxis(HORIZONTAL);
-
-        if (rigidbody)
-        {
-            Vector3 rotate = new Vector3(0, horizontal * turnSpeed, 0);
-
-            rigidbody.MovePosition(transform.position + transform.TransformDirection(new Vector3(0, 0, vertical)) * MoveSpeed * Time.fixedDeltaTime);
-            rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(rotate));
-        }
-        else
-        {
-            throw new Exception("Component rigidBody for Player is not defind or null. Check it out");
-        }
-    }
-
-    public void ChangeColor(Color color)
-    {
-        ChangeColorEvent?.Invoke(color);
-    }
-
-    public void SetNewHealthValue(float damageValue)
-    {
-        _currentHealth -= damageValue;
-
-        if (_currentHealth > 0)
-        {
-            ChangeHealthEvent?.Invoke(_currentHealth);
-        }
-        else
-        {
-            DeathEvent?.Invoke();
-        }
-    }
-
-    public void ChangeSpeed(float speed)
-    {
-        MoveSpeed += speed;
+        moveSpeed = 5f;
+        oldSpeed = moveSpeed;
+        turnSpeed = 2f;
+        moveSpeedBonusTime = 5f;
+        oldMoveSpeedBonusTime = moveSpeedBonusTime;
     }
 }
