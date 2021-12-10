@@ -16,6 +16,12 @@ public class PlayerHUDModel
         set => currentCubeBonusCount += value;
     }
 
+    public float TimerSeconds
+    {
+        get => timerSeconds;
+        set => timerSeconds = value;
+    }
+
     public PlayerHUDModel(PlayerHUDView playerHUDView)
     {
         timer = playerHUDView.transform.GetChild(1).GetComponent<Text>();
