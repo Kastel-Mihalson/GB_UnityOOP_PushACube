@@ -7,7 +7,11 @@ public class PlayerHUDController
     private PlayerHUDView _playerHUDView;
 
     public int MaxCubeBonusCount => _playerHUDModel.maxCubeBonusCount;
-    public float TimerSeconds => _playerHUDModel.timerSeconds;
+    public float TimerSeconds
+    {
+        get => _playerHUDModel.TimerSeconds;
+        set => _playerHUDModel.TimerSeconds = value;
+    }
     public int CurrentCubeBonusCount
     {
         get => _playerHUDModel.currentCubeBonusCount;

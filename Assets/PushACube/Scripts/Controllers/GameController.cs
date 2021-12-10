@@ -12,6 +12,8 @@ public class GameController : MonoBehaviour
     private GameObject _floorGameObject;
     private GameObject _gameOverDeathLine;
 
+    private GameObject _mainCamera;
+
     private GameObject _playerPrefab;
     private GameObject _playerGameObject;
     private PlayerController _playerController;
@@ -40,8 +42,12 @@ public class GameController : MonoBehaviour
     private EndGameView _endGameView;
     private bool _endGame;
 
-    private int _levelSizeX;
-    private int _levelSizeZ;
+    private float _levelSizeX;
+    private float _levelSizeZ;
+
+    private readonly KeyCode _saveGame = KeyCode.F5;
+    private readonly KeyCode _loadGame = KeyCode.F9;
+    private SaveDataRepository _saveDataRepository;
 
     #endregion
 
@@ -57,23 +63,27 @@ public class GameController : MonoBehaviour
         }
 
         Time.timeScale = 1;
-        _levelSizeX = 20;
-        _levelSizeZ = 30;
+        _saveDataRepository = new SaveDataRepository();
 
         // Загрузка префабов из ресурсов
         LoadResources();
         // Инициализация префабов, моделей, вью и контроллеров
         InitFloor();
         InitPlayer();
+        InitCamera();
         InitPlayerHUD();
         InitCubeSpeedBonus();
 
-        int cubeBonusCount = _playerHUDController.MaxCubeBonusCount;
+        _levelSizeX = _floorGameObject.transform.localScale.x;
+        _levelSizeZ = _floorGameObject.transform.localScale.z;
+
+        // int cubeBonusCount = _playerHUDController.MaxCubeBonusCount;
+        int cubeBonusCount = (int)_levelSizeX;
 
         for (int i = 0; i < cubeBonusCount; i++)
         {
-            float x = Random.Range((int)-10f, (int)9f) + 0.5f;
-            float z = Random.Range((int)-10f, (int)9f) + 0.5f;
+            float x = Random.Range((int)-(_levelSizeX / 2), (int)((_levelSizeX - 2) / 2)) + 0.5f;
+            float z = Random.Range((int)-(_levelSizeZ / 2), (int)((_levelSizeZ - 2) / 2)) + 0.5f;
 
             InitCubeBonus(x, z);
         }
@@ -89,19 +99,42 @@ public class GameController : MonoBehaviour
         InteractiveObjects();
         PlayerHUDUpdate();
         EndGameUpdate();
+        ExecuteSaveAndLoad(_playerView, _playerHUDModel);
     }
+
+    public void ExecuteSaveAndLoad(PlayerView data, PlayerHUDModel playerHudModel)
+    {
+        if (Input.GetKeyDown(_saveGame))
+        {
+            _saveDataRepository.Save(data, playerHudModel);
+            Debug.Log("Press F5");
+        }
+        if (Input.GetKeyDown(_loadGame))
+        {
+            _saveDataRepository.Load(data, playerHudModel);
+            Debug.Log("Press F9");
+        }
+    }
+
 
     private void InteractiveObjects()
     {
-        foreach (var _interactiveObject in _interactiveObjects)
+        if (_interactiveObjects == null)
         {
-            if (_interactiveObject == null)
+            _interactiveObjects = FindObjectsOfType<InteractiveObjects>().ToList();
+        }
+        else
+        {
+            foreach (var _interactiveObject in _interactiveObjects)
             {
-                continue;
-            }
-            if (_interactiveObject is InteractiveObjects interactiveObject)
-            {
-                interactiveObject.CubeBonusPingPongFlyAnim();
+                if (_interactiveObject == null)
+                {
+                    continue;
+                }
+                if (_interactiveObject is InteractiveObjects interactiveObject)
+                {
+                    interactiveObject.CubeBonusPingPongFlyAnim();
+                }
             }
         }
     }
@@ -124,8 +157,14 @@ public class GameController : MonoBehaviour
         _gameOverDeathLine = new GameObject("GameOverDeathLine");
 
         _gameOverDeathLine.AddComponent<BoxCollider>().isTrigger = true;
-        _gameOverDeathLine.transform.localScale = new Vector3(30f, 2f, 30f);
-        _gameOverDeathLine.transform.position = new Vector3(0f, -5f, 0f);
+        _gameOverDeathLine.transform.localScale = new Vector3(
+            _floorGameObject.transform.localScale.x + 15f, 
+            2f, 
+            _floorGameObject.transform.localScale.z + 15f);
+        _gameOverDeathLine.transform.position = new Vector3(
+            _floorGameObject.transform.position.x, 
+            _floorGameObject.transform.position.y - 4.75f, 
+            _floorGameObject.transform.position.z);
     }
 
     private void InitPlayer()
@@ -140,9 +179,27 @@ public class GameController : MonoBehaviour
         _playerView.GameOverDeathLine = _gameOverDeathLine;
     }
 
+    private void InitCamera()
+    {
+        _mainCamera = new GameObject("mainCamera");
+        _mainCamera.AddComponent<Camera>();
+        _mainCamera.AddComponent<DungeonCamera>();
+        
+        Instantiate(_mainCamera, _playerGameObject.transform.position + new Vector3(0, 10f, 0), Quaternion.identity);
+        var dungeonCamera = _mainCamera.gameObject.GetComponent<DungeonCamera>();
+
+        dungeonCamera.Target = _playerGameObject;
+    }
+
     private void InitCubeSpeedBonus()
     {
-        _cubeSpeedBonusGameObject = Instantiate(_cubeSpeedBonusPrefab, new Vector3(Random.Range((int)-9f, (int)9f), 0.5f, Random.Range((int)-9f, (int)9f)), Quaternion.identity);
+        _cubeSpeedBonusGameObject = Instantiate(
+            _cubeSpeedBonusPrefab, 
+            new Vector3(
+                Random.Range((int)-9f, 
+                (int)9f), 0.5f, 
+                Random.Range((int)-9f, (int)9f)), 
+            Quaternion.identity);
     }
 
     private void InitCubeBonus(float X, float Z)
