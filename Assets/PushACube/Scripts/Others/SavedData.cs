@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -6,8 +7,12 @@ public sealed class SavedData
 {
     public string Name { get; set; }
     public Vector3 Position { get; set; }
+    public Quaternion Rotation { get; set; }
     public bool IsEnabled { get; set; }
     public float Time { get; set; }
+    public int CubeBonusCount { get; set; }
+    public List<Vector3> CubeBonusPositions { get; set; }
+    public List<Vector3> CubeSpeedBonusPositions { get; set; }
 }
 
 [Serializable]

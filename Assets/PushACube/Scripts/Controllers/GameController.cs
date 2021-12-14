@@ -48,6 +48,7 @@ public class GameController : MonoBehaviour
     private readonly KeyCode _saveGame = KeyCode.F5;
     private readonly KeyCode _loadGame = KeyCode.F9;
     private SaveDataRepository _saveDataRepository;
+    private SavedData _savedData;
 
     #endregion
 
@@ -64,6 +65,7 @@ public class GameController : MonoBehaviour
 
         Time.timeScale = 1;
         _saveDataRepository = new SaveDataRepository();
+        _savedData = new SavedData();
 
         // Загрузка префабов из ресурсов
         LoadResources();
@@ -72,7 +74,10 @@ public class GameController : MonoBehaviour
         InitPlayer();
         InitCamera();
         InitPlayerHUD();
-        InitCubeSpeedBonus();
+
+        float x1 = Random.Range((int)-(_levelSizeX / 2), (int)((_levelSizeX - 2) / 2)) + 0.5f;
+        float z1 = Random.Range((int)-(_levelSizeZ / 2), (int)((_levelSizeZ - 2) / 2)) + 0.5f;
+        InitCubeSpeedBonus(x1, 0.5f, z1);
 
         _levelSizeX = _floorGameObject.transform.localScale.x;
         _levelSizeZ = _floorGameObject.transform.localScale.z;
@@ -84,7 +89,6 @@ public class GameController : MonoBehaviour
         {
             float x = Random.Range((int)-(_levelSizeX / 2), (int)((_levelSizeX - 2) / 2)) + 0.5f;
             float z = Random.Range((int)-(_levelSizeZ / 2), (int)((_levelSizeZ - 2) / 2)) + 0.5f;
-
             InitCubeBonus(x, z);
         }
 
@@ -99,23 +103,72 @@ public class GameController : MonoBehaviour
         InteractiveObjects();
         PlayerHUDUpdate();
         EndGameUpdate();
-        ExecuteSaveAndLoad(_playerView, _playerHUDModel);
+        ExecuteSaveAndLoad();
     }
 
-    public void ExecuteSaveAndLoad(PlayerView data, PlayerHUDModel playerHudModel)
+    public void ExecuteSaveAndLoad()
     {
         if (Input.GetKeyDown(_saveGame))
         {
-            _saveDataRepository.Save(data, playerHudModel);
+            _savedData = new SavedData()
+            {
+                Name = _playerView.gameObject.name,
+                IsEnabled = _playerView.gameObject.activeSelf,
+                Position = _playerView.transform.position,
+                Rotation = _playerView.transform.rotation,
+                Time = _playerHUDModel.TimerSeconds,
+                CubeBonusCount = _playerHUDModel.CurrentCubeBonusCount,
+                CubeBonusPositions = _interactiveObjects.Where(i => i != null && (i is CubeBonusView))
+                    .Select(i => i.transform.position).ToList(),
+                CubeSpeedBonusPositions = _interactiveObjects.Where(i => i != null && (i is CubeSpeedBonusView))
+                    .Select(i => i.transform.position).ToList()
+            };
+
+            _saveDataRepository.Save(_savedData);
             Debug.Log("Press F5");
         }
         if (Input.GetKeyDown(_loadGame))
         {
-            _saveDataRepository.Load(data, playerHudModel);
+            var loadingData = _saveDataRepository.Load();
+            InitLoadingSavedData(loadingData);
             Debug.Log("Press F9");
         }
     }
 
+    private void InitLoadingSavedData(SavedData loadingSavedData)
+    {
+        _playerView.gameObject.name = loadingSavedData.Name;
+        _playerView.transform.position = loadingSavedData.Position;
+        _playerView.transform.rotation = loadingSavedData.Rotation;
+        _playerView.gameObject.SetActive(loadingSavedData.IsEnabled);
+        _playerHUDModel.TimerSeconds = loadingSavedData.Time;
+        _playerHUDModel.CurrentCubeBonusCount = loadingSavedData.CubeBonusCount;
+
+        // delete all interactiveObjects
+        var index = 0;
+        var interactObjectCount = _interactiveObjects.Where(i => i != null).ToList();
+
+        for (int i = 0; i < interactObjectCount.Count(); i++)
+        { 
+            Destroy(interactObjectCount[index].gameObject);
+            index++;
+        }
+        _interactiveObjects = null;
+        
+        // instantiate interactiveObject by their position from loadingData
+        foreach (var cubeBonusPosition in loadingSavedData.CubeBonusPositions)
+        {
+            InitCubeBonus(cubeBonusPosition.x, cubeBonusPosition.z);
+        }
+
+        // instantiate cubeSpeedBonus by their position from loadingData
+        foreach (var item in loadingSavedData.CubeSpeedBonusPositions)
+        {
+            InitCubeSpeedBonus(item.x, item.y, item.z);
+        }
+
+        _interactiveObjects = FindObjectsOfType<InteractiveObjects>().ToList();
+    }
 
     private void InteractiveObjects()
     {
@@ -131,7 +184,7 @@ public class GameController : MonoBehaviour
                 {
                     continue;
                 }
-                if (_interactiveObject is InteractiveObjects interactiveObject)
+                if (_interactiveObject is CubeBonusView interactiveObject)
                 {
                     interactiveObject.CubeBonusPingPongFlyAnim();
                 }
@@ -191,15 +244,10 @@ public class GameController : MonoBehaviour
         dungeonCamera.Target = _playerGameObject;
     }
 
-    private void InitCubeSpeedBonus()
+    private void InitCubeSpeedBonus(float X, float Y, float Z)
     {
         _cubeSpeedBonusGameObject = Instantiate(
-            _cubeSpeedBonusPrefab, 
-            new Vector3(
-                Random.Range((int)-9f, 
-                (int)9f), 0.5f, 
-                Random.Range((int)-9f, (int)9f)), 
-            Quaternion.identity);
+            _cubeSpeedBonusPrefab, new Vector3(X, Y, Z), Quaternion.identity);
     }
 
     private void InitCubeBonus(float X, float Z)
