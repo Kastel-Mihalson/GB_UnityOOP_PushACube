@@ -13,7 +13,7 @@ public class PlayerHUDModel
     public int CurrentCubeBonusCount
     {
         get => currentCubeBonusCount;
-        set => currentCubeBonusCount += value;
+        set => currentCubeBonusCount = value;
     }
 
     public float TimerSeconds
@@ -30,7 +30,7 @@ public class PlayerHUDModel
 
         currentCubeBonusCount = 0;
         maxCubeBonusCount = 20;
-        timerSeconds = 20f;
+        timerSeconds = 60f;
         cubeBonusCounter.text = $"0 / {maxCubeBonusCount}";
     }
 }

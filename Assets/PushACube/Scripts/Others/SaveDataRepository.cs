@@ -24,38 +24,26 @@ public sealed class SaveDataRepository
         _path = Path.Combine(Application.dataPath, _folderName);
     }
 
-    public void Save(PlayerView player, PlayerHUDModel playerHUDModel)
+    public void Save(SavedData saveData)
     {
         if (!Directory.Exists(Path.Combine(_path)))
         {
             Directory.CreateDirectory(_path);
         }
 
-        var saveData = new SavedData
-        {
-            Name = player.transform.name,
-            Position = player.transform.position,
-            IsEnabled = player.gameObject.activeSelf,
-            Time = playerHUDModel.TimerSeconds
-        };
-
         _data.Save(saveData, Path.Combine(_path, _fileName));
         Debug.Log("Save player");
     }
 
-    public void Load(PlayerView player, PlayerHUDModel playerHUDModel)
+    public SavedData Load()
     {
         var file = Path.Combine(_path, _fileName);
 
-        if (!File.Exists(file)) return;
+        if (!File.Exists(file)) return new SavedData();
 
         var model = _data.Load(file);
-
-        player.transform.name = model.Name;
-        player.transform.position = model.Position;
-        player.gameObject.SetActive(model.IsEnabled);
-        playerHUDModel.TimerSeconds = model.Time;
-
         Debug.Log("Load player");
+
+        return model;
     }
 }

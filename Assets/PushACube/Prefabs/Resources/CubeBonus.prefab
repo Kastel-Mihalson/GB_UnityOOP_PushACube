@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 3714458230667977870}
   - component: {fileID: 8712495055779319598}
   - component: {fileID: 7156842507985939118}
+  - component: {fileID: 3330898303234103656}
   m_Layer: 0
   m_Name: CubeBonus
   m_TagString: Untagged
@@ -202,3 +203,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 674831b464735354cb24bea5733cf771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3330898303234103656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3070534019167557971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a9c24b504467564a80d02d8a1556604, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ico: {fileID: 8616427643890392828, guid: ca7aac6475aa41e48ad6872f70670fa9, type: 3}

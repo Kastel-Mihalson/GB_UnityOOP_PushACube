@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 8984189748590950265}
   - component: {fileID: 4020352150316473561}
   - component: {fileID: 5108528572314682636}
+  - component: {fileID: -380621535627609586}
   m_Layer: 0
   m_Name: CubeSpeedBonus
   m_TagString: Untagged
@@ -202,3 +203,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b5e642e94981994b920ffe789e8bbc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-380621535627609586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7331458328297048740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a9c24b504467564a80d02d8a1556604, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ico: {fileID: 8616427643890392828, guid: ca7aac6475aa41e48ad6872f70670fa9, type: 3}
