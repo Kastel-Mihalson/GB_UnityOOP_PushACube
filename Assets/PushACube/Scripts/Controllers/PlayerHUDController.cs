@@ -61,6 +61,6 @@ public class PlayerHUDController
 
     public void CubeBonusCountChanged(int cubeCount)
     {
-        _playerHUDModel.CurrentCubeBonusCount = cubeCount;
+        _playerHUDModel.CurrentCubeBonusCount += cubeCount;
     }
 }

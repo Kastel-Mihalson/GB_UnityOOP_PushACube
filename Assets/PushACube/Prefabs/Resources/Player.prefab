@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 9200556342222912584}
   - component: {fileID: 3896969042885653932}
   - component: {fileID: 3172157314235834623}
+  - component: {fileID: 470659013428485376}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -188,3 +189,16 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &470659013428485376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5406905254768777799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a9c24b504467564a80d02d8a1556604, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ico: {fileID: 0}
